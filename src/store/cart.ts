@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 
 export type CartItem = {
   productId: number;
+  slug?: string;
   name: string;
   pricePerKg: number;
   qtyKg: number;
@@ -27,7 +28,7 @@ export const useCart = create<CartState>()(
             return {
               items: s.items.map((i) =>
                 i.productId === item.productId
-                  ? { ...i, qtyKg: i.qtyKg + qtyKg }
+                  ? { ...i, slug: item.slug ?? i.slug, qtyKg: i.qtyKg + qtyKg }
                   : i,
               ),
             };

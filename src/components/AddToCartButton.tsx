@@ -5,8 +5,10 @@ import { useCart } from "@/store/cart";
 
 export default function AddToCartButton({
   product,
+  disabled = false,
 }: {
-  product: { id: number; name: string; pricePerKg: number };
+  product: { id: number; name: string; slug: string; pricePerKg: number };
+  disabled?: boolean;
 }) {
   const add = useCart((s) => s.add);
   const [added, setAdded] = useState(false);
@@ -14,18 +16,24 @@ export default function AddToCartButton({
   return (
     <button
       type="button"
+      disabled={disabled}
       onClick={() => {
         add({
           productId: product.id,
+          slug: product.slug,
           name: product.name,
           pricePerKg: product.pricePerKg,
         });
         setAdded(true);
         setTimeout(() => setAdded(false), 1000);
       }}
-      className="mt-3 w-full rounded-lg bg-green-600 py-2 text-sm text-white"
+      className={`mt-4 w-full rounded-xl py-2.5 text-sm font-medium transition active:scale-95 disabled:cursor-not-allowed disabled:bg-stone-200 disabled:text-stone-500 ${
+        added
+          ? "bg-green-100 text-green-700"
+          : "bg-green-600 text-white hover:bg-green-700"
+      }`}
     >
-      {added ? "اضافه شد ✓" : "افزودن به سبد (۱ کیلو)"}
+      {disabled ? "ناموجود" : added ? "اضافه شد ✓" : "افزودن به سبد (۱ کیلو)"}
     </button>
   );
 }

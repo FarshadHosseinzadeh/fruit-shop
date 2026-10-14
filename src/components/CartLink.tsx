@@ -9,7 +9,11 @@ export default function CartLink() {
   const count = useCart((s) => s.items.length);
 
   return (
-    <Link href="/cart" aria-label="سبد خرید" className="relative p-1">
+    <Link
+      href="/cart"
+      aria-label="سبد خرید"
+      className="relative flex h-10 w-10 items-center justify-center rounded-full text-stone-700 transition hover:bg-green-50 hover:text-green-700"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
@@ -25,7 +29,7 @@ export default function CartLink() {
         <path d="M2 3h3l2.7 12.4a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L21 7H6" />
       </svg>
       {mounted && count > 0 && (
-        <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-green-600 px-1 text-xs text-white">
+        <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-green-600 px-1 text-xs font-medium text-white ring-2 ring-white">
           {count.toLocaleString("fa-IR")}
         </span>
       )}

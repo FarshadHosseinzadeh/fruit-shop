@@ -12,6 +12,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model Product {
   id          Int         @id @default(autoincrement())
   name        String
@@ -31,6 +36,7 @@ model User {
   name         String
   phone        String   @unique
   passwordHash String
+  role         Role     @default(USER)
   createdAt    DateTime @default(now())
   orders       Order[]
 }

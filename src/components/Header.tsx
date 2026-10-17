@@ -21,6 +21,14 @@ export default async function Header() {
         <nav className="flex items-center gap-1 text-sm sm:gap-3">
           {user ? (
             <>
+              {user.role === "ADMIN" && (
+                <Link
+                  href="/admin"
+                  className="rounded-full bg-amber-100 px-3 py-2 font-medium text-amber-800 transition hover:bg-amber-200"
+                >
+                  مدیریت
+                </Link>
+              )}
               <Link
                 href="/orders"
                 className="rounded-full px-3 py-2 font-medium text-stone-600 transition hover:bg-green-50 hover:text-green-700"

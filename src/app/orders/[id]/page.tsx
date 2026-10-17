@@ -9,6 +9,9 @@ import {
   formatOrderNumber,
 } from "@/lib/format";
 import { fruitEmoji } from "@/lib/fruitEmoji";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "جزئیات سفارش" };
 
 const STEPS: string[] = ["PENDING", "PREPARING", "ON_THE_WAY", "DELIVERED"];
 

@@ -5,6 +5,9 @@ import { requireUser } from "@/lib/auth";
 import { STATUS_LABEL, STATUS_STYLE } from "@/lib/orderStatus";
 import { formatDeliveryDay, formatOrderNumber } from "@/lib/format";
 import { fruitEmoji } from "@/lib/fruitEmoji";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "سفارش ثبت شد" };
 
 export default async function OrderSuccessPage({
   params,

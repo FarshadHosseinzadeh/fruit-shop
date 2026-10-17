@@ -1,12 +1,20 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/vazirmatn";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "فروت شاپ",
-  description: "فروشگاه آنلاین میوه",
+  title: {
+    default: "فروت شاپ | میوه‌ی تازه درب منزل",
+    template: "%s | فروت شاپ",
+  },
+  description:
+    "فروشگاه آنلاین میوه با انتخاب روز و بازه‌ی تحویل و پرداخت درب منزل",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#16a34a",
 };
 
 export default function RootLayout({

@@ -3,15 +3,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-
-const SLOT_START: Record<string, number> = {
-  "۹ تا ۱۲": 9,
-  "۱۲ تا ۱۵": 12,
-  "۱۵ تا ۱۸": 15,
-  "۱۸ تا ۲۱": 18,
-};
-const MIN_LEAD_HOURS = 3;
-const HOUR_MS = 60 * 60 * 1000;
+import { tehranNowMs, validateDelivery } from "@/lib/delivery";
 
 const schema = z.object({
   items: z
@@ -35,31 +27,6 @@ export type PlaceOrderResult = { error: string } | { orderId: number };
 
 class OrderError extends Error {}
 
-// ساعت دیواری تهران، به‌صورت میلی‌ثانیه‌ی UTC برای مقایسه‌ی ساده
-function tehranNowMs() {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Tehran",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(new Date());
-  const get = (t: string) => Number(parts.find((p) => p.type === t)!.value);
-  return Date.UTC(
-    get("year"),
-    get("month") - 1,
-    get("day"),
-    get("hour"),
-    get("minute"),
-  );
-}
-
-function isoDay(ms: number) {
-  return new Date(ms).toISOString().slice(0, 10);
-}
-
 export async function placeOrder(
   input: PlaceOrderInput,
 ): Promise<PlaceOrderResult> {
@@ -71,22 +38,11 @@ export async function placeOrder(
   }
   const { items, deliveryDate, deliverySlot, address, note } = parsed.data;
 
-  // قانون روز و بازه
-  const nowMs = tehranNowMs();
-  const allowedDays = [isoDay(nowMs), isoDay(nowMs + 24 * HOUR_MS)];
-  const startHour = SLOT_START[deliverySlot];
-  if (!allowedDays.includes(deliveryDate) || startHour === undefined) {
-    return { error: "روز یا بازه‌ی تحویل معتبر نیست" };
-  }
-  const [y, m, d] = deliveryDate.split("-").map(Number);
-  const slotStartMs = Date.UTC(y, m - 1, d, startHour);
-  if (slotStartMs < nowMs + MIN_LEAD_HOURS * HOUR_MS) {
-    return {
-      error: "این بازه دیگر قابل رزرو نیست، بازه‌ی دیگری انتخاب کنید",
-    };
+  const delivery = validateDelivery(tehranNowMs(), deliveryDate, deliverySlot);
+  if (!delivery.ok) {
+    return { error: delivery.error };
   }
 
-  // محصولات از دیتابیس
   const ids = items.map((i) => i.productId);
   if (new Set(ids).size !== ids.length) {
     return { error: "سبد خرید نامعتبر است" };

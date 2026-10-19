@@ -1,5 +1,6 @@
 # 🍎 Fruit Shop (فروت شاپ)
 
+![CI](https://github.com/FarshadHosseinzadeh/fruit-shop/actions/workflows/ci.yml/badge.svg)
 A full-stack online fruit shop with delivery-slot booking, built as a portfolio project.
 Customers browse fruits sold by the kilogram, fill a cart, pick a delivery day and time slot, and pay cash on delivery.
 
@@ -15,6 +16,7 @@ Customers browse fruits sold by the kilogram, fill a cart, pick a delivery day a
 - Checkout with delivery day (today or tomorrow) and time slots (9-12, 12-15, 15-18, 18-21)
 - Order placed in a single database transaction, with stock decrement
 - Order history, order detail page and a step-by-step status tracker (pending, preparing, on the way, delivered)
+- Admin panel with roles (USER/ADMIN): protected routes, all orders with a status filter, one-step-at-a-time status updates, and product price, stock and visibility management
 - Persian UI, right-to-left layout, responsive design
 
 ## Implementation notes
@@ -49,6 +51,8 @@ Open http://localhost:3000.
 ```bash
 pnpm exec prisma db seed                              # seed 10 fruits
 pnpm exec tsx prisma/set-status.ts <orderId> <STATUS> # move an order one step forward
+pnpm exec tsx prisma/make-admin.ts <phone>             # promote an existing user to admin
+pnpm test                                             # run unit tests (delivery slot rules)
 pnpm build                                            # production build
 ```
 
@@ -64,7 +68,7 @@ src/store/         Zustand cart store
 
 ## Roadmap
 
-- Admin panel (products, stock, discounts, order status)
+- Discounts and sales statistics in the admin panel
 - Search and filter for orders
 - Map picker for the delivery address
 - Product photos

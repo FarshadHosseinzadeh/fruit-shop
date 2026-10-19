@@ -12,7 +12,13 @@ import {
 export const metadata: Metadata = { title: "سفارش‌ها (مدیریت)" };
 export const dynamic = "force-dynamic";
 
-const STATUSES = ["PENDING", "PREPARING", "ON_THE_WAY", "DELIVERED"] as const;
+const STATUSES = [
+  "PENDING",
+  "PREPARING",
+  "ON_THE_WAY",
+  "DELIVERED",
+  "CANCELLED",
+] as const;
 type Status = (typeof STATUSES)[number];
 
 function chip(on: boolean) {

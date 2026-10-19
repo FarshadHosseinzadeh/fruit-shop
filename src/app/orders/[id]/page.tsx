@@ -1,19 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { STATUS_LABEL, STATUS_STYLE } from "@/lib/orderStatus";
+import { STATUS_FLOW, STATUS_LABEL, STATUS_STYLE } from "@/lib/orderStatus";
 import {
   formatCreatedAt,
   formatDeliveryDay,
   formatOrderNumber,
 } from "@/lib/format";
 import { fruitEmoji } from "@/lib/fruitEmoji";
-import type { Metadata } from "next";
+import CancelOrderButton from "@/components/CancelOrderButton";
 
 export const metadata: Metadata = { title: "جزئیات سفارش" };
 
-const STEPS: string[] = ["PENDING", "PREPARING", "ON_THE_WAY", "DELIVERED"];
+const STEPS: string[] = [...STATUS_FLOW];
 
 export default async function OrderDetailPage({
   params,
@@ -48,45 +49,62 @@ export default async function OrderDetailPage({
         </span>
       </div>
 
-      <section className="mb-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-5 font-extrabold">وضعیت سفارش</h2>
-        <ol className="flex">
-          {STEPS.map((s, idx) => (
-            <li
-              key={s}
-              className="relative flex flex-1 flex-col items-center gap-2 text-center"
-            >
-              {idx < STEPS.length - 1 && (
+      {order.status === "CANCELLED" ? (
+        <section className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">
+          <h2 className="mb-1 font-extrabold">این سفارش لغو شده است</h2>
+          <p>مبلغی از شما دریافت نشده و موجودی محصولات به انبار برگشته است.</p>
+        </section>
+      ) : (
+        <section className="mb-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+          <h2 className="mb-5 font-extrabold">وضعیت سفارش</h2>
+          <ol className="flex">
+            {STEPS.map((s, idx) => (
+              <li
+                key={s}
+                className="relative flex flex-1 flex-col items-center gap-2 text-center"
+              >
+                {idx < STEPS.length - 1 && (
+                  <span
+                    className={`absolute start-1/2 top-4 h-0.5 w-full ${
+                      idx < currentIndex ? "bg-green-600" : "bg-stone-200"
+                    }`}
+                  />
+                )}
                 <span
-                  className={`absolute start-1/2 top-4 h-0.5 w-full ${
-                    idx < currentIndex ? "bg-green-600" : "bg-stone-200"
+                  className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                    idx < currentIndex
+                      ? "bg-green-600 text-white"
+                      : idx === currentIndex
+                        ? "bg-green-600 text-white ring-4 ring-green-200"
+                        : "bg-stone-200 text-stone-500"
                   }`}
-                />
-              )}
-              <span
-                className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-                  idx < currentIndex
-                    ? "bg-green-600 text-white"
-                    : idx === currentIndex
-                      ? "bg-green-600 text-white ring-4 ring-green-200"
-                      : "bg-stone-200 text-stone-500"
-                }`}
-              >
-                {idx < currentIndex ? "✓" : (idx + 1).toLocaleString("fa-IR")}
-              </span>
-              <span
-                className={`text-xs ${
-                  idx === currentIndex
-                    ? "font-bold text-green-700"
-                    : "text-stone-500"
-                }`}
-              >
-                {STATUS_LABEL[s]}
-              </span>
-            </li>
-          ))}
-        </ol>
-      </section>
+                >
+                  {idx < currentIndex ? "✓" : (idx + 1).toLocaleString("fa-IR")}
+                </span>
+                <span
+                  className={`text-xs ${
+                    idx === currentIndex
+                      ? "font-bold text-green-700"
+                      : "text-stone-500"
+                  }`}
+                >
+                  {STATUS_LABEL[s]}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
+      {order.status === "PENDING" && (
+        <section className="mb-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+          <h2 className="mb-1 font-extrabold">لغو سفارش</h2>
+          <p className="mb-3 text-xs text-stone-500">
+            تا قبل از شروع آماده‌سازی می‌توانید سفارش را لغو کنید.
+          </p>
+          <CancelOrderButton orderId={order.id} />
+        </section>
+      )}
 
       <section className="mb-4 rounded-2xl border border-stone-200 bg-white p-5 text-sm shadow-sm">
         <h2 className="mb-3 font-extrabold">اطلاعات سفارش</h2>

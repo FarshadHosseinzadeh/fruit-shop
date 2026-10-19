@@ -16,6 +16,7 @@ Customers browse fruits sold by the kilogram, fill a cart, pick a delivery day a
 - Checkout with delivery day (today or tomorrow) and time slots (9-12, 12-15, 15-18, 18-21)
 - Order placed in a single database transaction, with stock decrement
 - Order history, order detail page and a step-by-step status tracker (pending, preparing, on the way, delivered)
+- Customers can cancel an order while it is still pending; stock is restored in the same database transaction (race-safe, only the owner can cancel)
 - Admin panel with roles (USER/ADMIN): protected routes, all orders with a status filter, one-step-at-a-time status updates, and product price, stock and visibility management
 - Persian UI, right-to-left layout, responsive design
 

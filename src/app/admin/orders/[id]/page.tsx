@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
-import { STATUS_LABEL, STATUS_STYLE } from "@/lib/orderStatus";
+import { STATUS_LABEL, STATUS_STYLE, nextStatus } from "@/lib/orderStatus";
 import {
   formatCreatedAt,
   formatDeliveryDay,
@@ -15,8 +15,6 @@ import AdvanceButton from "@/components/admin/AdvanceButton";
 
 export const metadata: Metadata = { title: "جزئیات سفارش (مدیریت)" };
 export const dynamic = "force-dynamic";
-
-const FLOW = ["PENDING", "PREPARING", "ON_THE_WAY", "DELIVERED"] as const;
 
 export default async function AdminOrderPage({
   params,
@@ -38,8 +36,7 @@ export default async function AdminOrderPage({
   });
   if (!order) notFound();
 
-  const nextStatus =
-    FLOW[FLOW.indexOf(order.status as (typeof FLOW)[number]) + 1];
+  const next = nextStatus(order.status);
 
   return (
     <div>
@@ -56,10 +53,14 @@ export default async function AdminOrderPage({
 
       <section className="mb-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
         <h2 className="mb-3 font-extrabold">تغییر وضعیت</h2>
-        {nextStatus ? (
+        {next ? (
           <form action={advanceOrderStatus.bind(null, order.id)}>
-            <AdvanceButton label={`انتقال به: ${STATUS_LABEL[nextStatus]}`} />
+            <AdvanceButton label={`انتقال به: ${STATUS_LABEL[next]}`} />
           </form>
+        ) : order.status === "CANCELLED" ? (
+          <p className="text-sm text-red-700">
+            این سفارش لغو شده و موجودی آن به انبار برگشته است.
+          </p>
         ) : (
           <p className="text-sm text-green-700">
             این سفارش تحویل شده و مرحله‌ی بعدی ندارد.
